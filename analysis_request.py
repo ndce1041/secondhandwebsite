@@ -1,6 +1,7 @@
 
 ENTERb = "\r\n".encode('utf-8')
 ENTER = "\r\n"
+from urllib.parse import unquote
 
 class AnalysisRequest(object):
     """
@@ -23,6 +24,7 @@ class AnalysisRequest(object):
         request_head_list = self.head_decode.split(ENTER) # 请求头分割为列表
         try:
             self.request_head['method'],self.request_head['path'],self.request_head['protocol'] = request_head_list[0].split(' ')
+            self.request_head["path"] = unquote(self.request_head["path"])
             self.path()
         except:
             #log.error('请求头解析失败')
