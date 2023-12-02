@@ -8,6 +8,7 @@ cur.execute("""CREATE TABLE IF NOT EXISTS user (
             username char(20) NOT NULL, 
             password char(20) NOT NULL,
             money money NOT NULL,
+            token char(20),
             last_login datetime)""")
 # 商品表
 cur.execute("""CREATE TABLE IF NOT EXISTS goods (
@@ -42,8 +43,8 @@ state: 0-未出售|未完成 1-已出售|已完成 2-已下架|已取消
 
 # 插入测试数据
 
-cur.execute("INSERT INTO user VALUES ('1000000001', 'admin', 'admin', 100000,'NULL')")
-cur.execute("INSERT INTO user VALUES ('1000000002', 'user1', 'user1', 10,'NULL')")
+cur.execute("INSERT INTO user VALUES ('1000000001', 'admin', 'admin', 100000,'NULL','NULL')")
+cur.execute("INSERT INTO user VALUES ('1000000002', 'user1', 'user1', 10,'NULL','NULL')")
 
 cur.execute("INSERT INTO goods VALUES ('1000000001', '1000000001', 'iphone 12', 100, 'iphone 12 128G', 'iphone12.jpg', 0, 'NULL')")
 

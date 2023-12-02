@@ -124,13 +124,19 @@ class Server:
             # 数据存在self.request_head中
 
             # 路由分发
-            try:
-                func,rest = self.url.get(self.request['path']["url"])
-                # print(func,rest)
-                ans = func(self.request,key,rest=rest)
-            except Exception as e:
-                ERROR('路由分发失败')
-                print(e)
+            ans = None
+            func,rest = self.url.get(self.request['path']["url"])
+            print("run")
+            ans = func(self.request,key,rest=rest)
+            # try:
+            #     func,rest = self.url.get(self.request['path']["url"])
+            #     print(func,rest)
+            #     ans = func(self.request,key,rest=rest)
+            # except Exception as e:
+            #     ERROR('路由分发失败')
+            #     print(self.request['path']["url"])
+            #     print(self.url.url)
+            #     print(self.request['path']["url"][0] in self.url.url)
             if ans == None:
                 key[0].send(ResponseMaker(code=404).content())
                 key[0].close()
@@ -169,9 +175,7 @@ class Server:
                         self.selector.unregister(new_socket.fileno())
                     except:
                         pass
-                    
                     new_socket.close()
-                    raise Exception('客户端断开连接%s' % (str(client_addr)))
         
 
 

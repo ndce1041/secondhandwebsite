@@ -44,15 +44,15 @@ class ResponseMaker:
         
         cookie_setting = ""
         if expires:
-            cookie_setting += "; Expires=" + expires
+            cookie_setting += "; Expires=" + str(expires)
         if path:
-            cookie_setting += "; Path=" + path
+            cookie_setting += "; Path=" + str(path)
         if domain:
-            cookie_setting += "; Domain=" + domain
+            cookie_setting += "; Domain=" + str(domain)
         if max_age:
-            cookie_setting += "; Max-Age=" + max_age
+            cookie_setting += "; Max-Age=" + str(max_age)
         if samesite:
-            cookie_setting += "; SameSite=" + samesite
+            cookie_setting += "; SameSite=" + str(samesite)
         if secure:
             cookie_setting += "; Secure"
         if httponly:
@@ -111,3 +111,8 @@ class ResponseMaker:
         
         
         return head_str.encode("utf-8") + cookie_str.encode("utf-8") + b'\r\n\r\n' + self.response_body
+
+    def quick_jump(self,url:str):
+        # set_body会覆盖
+        self.response_body = b'<html><head><meta http-equiv="refresh" content="0;url=' + url.encode('utf-8') + b'"></head></html>'
+        return self

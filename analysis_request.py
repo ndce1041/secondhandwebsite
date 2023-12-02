@@ -20,7 +20,7 @@ class AnalysisRequest(object):
             raise Exception('数据解码失败')
 
         # 解析请求头
-        self.request_head = {"data":self.data_body}
+        self.request_head = {"body":self.data_body}
         request_head_list = self.head_decode.split(ENTER) # 请求头分割为列表
         try:
             self.request_head['method'],self.request_head['path'],self.request_head['protocol'] = request_head_list[0].split(' ')
@@ -42,6 +42,9 @@ class AnalysisRequest(object):
     # read only
     def __getitem__(self,key):
         return self.request_head[key]
+    
+    def __setitem__(self,key,value):
+        self.request_head[key] = value
     
     def __str__(self) -> str:
         return str(self.request_head)
