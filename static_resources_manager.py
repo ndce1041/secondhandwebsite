@@ -25,9 +25,9 @@ def static(request,key, rest):
         path += '/' + i
 
 
-    print(request.path())
-    print(rest)
-    print(path)
+    # print(request.path())
+    # print(rest)
+    # print(path)
 
     # 判断文件是否存在
     # 判断文件大小 如果文件过大则不返回 需要额外处理

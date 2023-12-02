@@ -6,6 +6,7 @@ import logging
 from urllib.parse import unquote,urlparse  # , quote
 from selectors import DefaultSelector, EVENT_READ, EVENT_WRITE
 from url_manager import url_manager
+from read_config import *
 
 import analysis_request
 AnalysisRequest = analysis_request.AnalysisRequest
@@ -54,35 +55,35 @@ PROTOCOL = 'HTTP/1.1'
 IP = "127.0.0.1"
 
 # 导入config文件  所有项都会声明为全局变量
-DEBUG("#读取配置文件......#")
+# DEBUG("#读取配置文件......#")
 
-try:
-    with open(PATH + '/xweb.conf', 'r',encoding="utf-8") as conf:
-        conf_dict = eval(conf.read())
-except Exception as e:
-    ERROR('配置文件读取失败,请检查配置文件是否存在或者格式是否正确',e)
-    exit(1)
-else:
-    # TODO 添加静态资源默认回调
-    if "http_port" in conf_dict:
-        PORT = conf_dict['http_port']
-        print(PORT)
-    if "network_protocol" in conf_dict:
-        PROTOCOL = conf_dict['network_protocol']
-        print(PROTOCOL)
-    if "IP" in conf_dict:
-        IP = conf_dict['IP']
-        print(IP)
-    if "TIMEOUT" in conf_dict:
-        TIMEOUT = conf_dict['TIMEOUT']
-        print(TIMEOUT)
-    if "static_path" in conf_dict:
-        STATIC_PATH = conf_dict['static_path']
+# try:
+#     with open(PATH + '/xweb.conf', 'r',encoding="utf-8") as conf:
+#         conf_dict = eval(conf.read())
+# except Exception as e:
+#     ERROR('配置文件读取失败,请检查配置文件是否存在或者格式是否正确',e)
+#     exit(1)
+# else:
+#     # TODO 添加静态资源默认回调
+#     if "http_port" in conf_dict:
+#         PORT = conf_dict['http_port']
+#         print(PORT)
+#     if "network_protocol" in conf_dict:
+#         PROTOCOL = conf_dict['network_protocol']
+#         print(PROTOCOL)
+#     if "IP" in conf_dict:
+#         IP = conf_dict['IP']
+#         print(IP)
+#     if "TIMEOUT" in conf_dict:
+#         TIMEOUT = conf_dict['TIMEOUT']
+#         print(TIMEOUT)
+#     if "static_path" in conf_dict:
+#         STATIC_PATH = conf_dict['static_path']
         
-        print(STATIC_PATH)
-    if "static_url" in conf_dict:
-        STATIC_URL = conf_dict['static_url'].strip('/')
-        print(STATIC_URL)
+#         print(STATIC_PATH)
+#     if "static_url" in conf_dict:
+#         STATIC_URL = conf_dict['static_url'].strip('/')
+#         print(STATIC_URL)
 
 INFO('配置文件读取成功,端口:%s,协议:%s,IP:%s' % (PORT, PROTOCOL, IP))
 
@@ -129,7 +130,6 @@ class Server:
             # 路由分发
             ans = None
             func,rest = self.url.get(self.request['path']["url"])
-            print("run")
             ans = func(self.request,key,rest=rest)
             # try:
             #     func,rest = self.url.get(self.request['path']["url"])
@@ -191,7 +191,7 @@ class Server:
             self.request = AnalysisRequest(recv_data)
         except Exception as e:
             ERROR('请求头解析失败')
-            print(e)
+            ERROR(e)
             raise Exception('请求头解析失败%s' % str(client_addr) )
         
         # 第一行解析成功说明是有效的请求头
@@ -202,14 +202,14 @@ class Server:
 
     def loop(self):
         while True:
-            print('等待事件发生...')
+            INFO('等待事件发生...')
             events = self.selector.select(timeout=TIMEOUT)
             for key, mask in events:
                 # 获取key[0]套接字的ip和端口
                 #print(key)
                 try:
                     ip = key[0].getpeername()
-                    print("套接字响应",ip)
+                    INFO("套接字响应",ip)
                 except:
                     pass
             

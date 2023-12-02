@@ -28,11 +28,10 @@ class Template:
         """
         替换模板
         """
-        print("替换")
 
         def replace(match):
             temp = match.group("name")
-            print(temp)
+            # print(temp)
             temp = temp.split(".")
             value = self.template_dict.copy()
             for i in temp:

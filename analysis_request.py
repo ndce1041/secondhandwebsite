@@ -86,7 +86,7 @@ class AnalysisRequest(object):
 
 
     def path(self):
-        print(self.request_head['path'])
+        # print(self.request_head['path'])
         if type(self.request_head['path']) == str:
             url = dict()
             if '?' in self.request_head['path']:
