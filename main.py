@@ -1,5 +1,6 @@
 import xhome as xh
 import response_maker as rm
+import template as tp
 
 
 import sqlite3 as sql
@@ -74,11 +75,49 @@ def logincheck(request,key,rest):
 
 server.url.add('/logincheck',logincheck)
 
+@UserCheck
+def shoppage(request,key,rest):
+    # 读取分页信息
+    url_info = request.path()["paramenters"]
 
-# def shoppage(request,key,rest):
-#     # TODO 从数据库中获取商品信息
-#     with open("shoppage.html","rb") as f:
-#         return rm.ResponseMaker().set_body(f.read())
+    if "page" in url_info:
+        page = int(url_info["page"])
+    else:
+        page = 1
+
+    perpage_num = 3
+
+    # 一页3个商品
+    # TODO 从数据库中获取商品信息
+    cur.execute("SELECT gid FROM goods WHERE state = 0")
+    if page == 1:
+        goods = cur.fetchmany(perpage_num)
+    else:
+        for i in range(page-2):
+            cur.fetchmany(perpage_num)
+        goods = cur.fetchmany(perpage_num)
+
+    if "uid" in request.cookie():
+        uid = request.cookie()["uid"]
+    else:
+        return rm.ResponseMaker().quick_jump("/login")
+    info = {}
+    # 获取用户信息
+    cur.execute("SELECT username,money FROM user WHERE uid = ?",(uid,))
+    info["username"],info["money"] = cur.fetchone()
+
+    # 获取商品信息
+    for i in range(perpage_num):
+        if i+1 > len(goods):
+            info["goods%d" % (i+1)] = {"gid":"","text":"","img_path":""}
+            continue
+        cur.execute("SELECT name,prise,description,image FROM goods WHERE gid = ?",(goods[i][0],))
+        name,price,description,img_path = cur.fetchone()
+        info["goods%d" % (i+1)] = {"gid":goods[i][0],"text":"%s %s花西币\n%s" % (name,str(price),description),"img_path":img_path}
+
+    # 拼接模板
+    return tp.Template("./static/html/viewpage.html",info)
+    
     
 
 # server.url.add('/shoppage',shoppage)
