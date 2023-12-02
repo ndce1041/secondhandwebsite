@@ -54,39 +54,39 @@ class AnalysisRequest(object):
 
 
     def cookie(self):
-        if 'cookie' not in self.request_head:
-            self.request_head['cookie'] = {}
-        elif type(self.request_head['cookie']) == str:
+        if 'Cookie' not in self.request_head:
+            self.request_head['Cookie'] = {}
+        elif type(self.request_head['Cookie']) == str:
 
-            temp = [i.split('=',1) for i in self.request_head['cookie'].split(';')]
+            temp = [i.split('=',1) for i in self.request_head['Cookie'].split(';')]
             for i in range(len(temp)):
                 temp[i][0] = temp[i][0].strip()
 
-            self.request_head['cookie'] = dict(temp)
-        return self.request_head['cookie']
+            self.request_head['Cookie'] = dict(temp)
+        return self.request_head['Cookie']
     
     def accept(self):
 
-        if "accept" not in self.request_head:
-            self.request_head['accept'] = []
-        elif type(self.request_head['accept']) == str:
-            self.request_head['accept'] = self.request_head['accept'].split(',')
-            for i in range(len(self.request_head['accept'])):
-                if ";" in self.request_head['accept'][i]:
-                    temp = self.request_head['accept'][i].split(';')
+        if "Accept" not in self.request_head:
+            self.request_head['Accept'] = []
+        elif type(self.request_head['Accept']) == str:
+            self.request_head['Accept'] = self.request_head['Accept'].split(',')
+            for i in range(len(self.request_head['Accept'])):
+                if ";" in self.request_head['Accept'][i]:
+                    temp = self.request_head['Accept'][i].split(';')
                     for j in temp:
                         if "q=" in j: # 排除除q以外其他参数
-                            self.request_head['accept'][i] = (temp[0],j.split('=')[1])
+                            self.request_head['Accept'][i] = (temp[0],j.split('=')[1])
                         else:
-                            self.request_head['accept'][i] = (temp[0],1)
+                            self.request_head['Accept'][i] = (temp[0],1)
                 else:
-                    self.request_head["accept"][i] = (self.request_head['accept'][i],1)
-        return self.request_head['accept']
+                    self.request_head["Accept"][i] = (self.request_head['Accept'][i],1)
+        return self.request_head['Accept']
 
 
 
     def path(self):
-        # print(self.request_head['path'])
+        print(self.request_head['path'])
         if type(self.request_head['path']) == str:
             url = dict()
             if '?' in self.request_head['path']:
@@ -94,6 +94,8 @@ class AnalysisRequest(object):
                 for i in range(len(url["parameters"])):
                     url["parameters"][i] = url["parameters"][i].split('=')
                 url['parameters'] = dict(url['parameters'])
+            else:
+                url["parameters"] = {}
             url['path'] = self.request_head['path'].split('?')[0]
             url['url'] = tuple([i for i in url['path'].split('/') if i])
             self.request_head['path'] = url

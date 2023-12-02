@@ -1,3 +1,4 @@
+
 import xhome as xh
 import response_maker as rm
 import template as tp
@@ -10,6 +11,9 @@ import middleware as md
 # 哈希
 import hashlib
 import random
+
+
+
 
 server = xh.Server()
 con = sql.connect("main.db")
@@ -26,13 +30,17 @@ def UserCheck(func):
             cur.execute("SELECT token FROM user WHERE uid = ?",(cookie["uid"],))
             token = cur.fetchone()[0]
             if token == cookie["token"]:
+                #print("token正确")
                 # token正确 执行函数
                 return func(request,key,rest)
             else:
+                #print("token错误")
                 # token错误
                 return rm.ResponseMaker().quick_jump("/login")
         else:
+            #print("没有token")
             #没有token
+            print(cookie)
             return rm.ResponseMaker().quick_jump("/login")
     return usercheck
 
@@ -45,9 +53,9 @@ server.url.add('/login',login)
 
 @md.Form
 def logincheck(request,key,rest):
-    print("logincheck") # TODO
+    # print("logincheck")
     uid = request['form']["uid"]
-    hash_pass = request['form']["password"] # TODO 此处应该是 密码+salt 后的hash值
+    hash_pass = request['form']["password"] # 此处应该是 密码+salt 后的hash值
     salt = request['form']["salt"] # salt由前端随机生成
     try:
         cur.execute("SELECT password FROM user WHERE uid = ?",(uid,))
@@ -55,6 +63,7 @@ def logincheck(request,key,rest):
         # 比对密码
         token = hashlib.sha256((password+salt).encode("utf-8")).hexdigest()
         if hash_pass == token:
+            # print("密码正确")
             # 密码正确
             # 写入数据库
             cur.execute("UPDATE user SET token = ? WHERE uid = ?",(token,uid))
@@ -62,15 +71,16 @@ def logincheck(request,key,rest):
             cur.execute("UPDATE user SET last_login = ? WHERE uid = ?",("datetime('now','localtime')",uid))
             con.commit()
             # 写入cookie 设置30天过期
-            return rm.ResponseMaker().set_cookie("token",token,expires=30).set_cookie("uid",uid,expires=30).quick_jump("/mainpage") # TODO 跳转到主页
+            return rm.ResponseMaker().set_cookie("token",token,expires=30,path="/").set_cookie("uid",uid,expires=30,path="/").quick_jump("/shoppage") # TODO 跳转到主页
         else:
             # 密码错误
+            # print("密码错误")
             return rm.ResponseMaker().quick_jump("/login")
     except:
         # uid不存在
         print(type(uid))
         print(len(uid))
-        print("uid不存在,uid:%s" % uid) # TODO
+        print("uid不存在,uid:%s" % uid)
         return rm.ResponseMaker().quick_jump("/login")
 
 server.url.add('/logincheck',logincheck)
@@ -78,7 +88,7 @@ server.url.add('/logincheck',logincheck)
 @UserCheck
 def shoppage(request,key,rest):
     # 读取分页信息
-    url_info = request.path()["paramenters"]
+    url_info = request.path()["parameters"]
 
     if "page" in url_info:
         page = int(url_info["page"])
@@ -111,17 +121,20 @@ def shoppage(request,key,rest):
         if i+1 > len(goods):
             info["goods%d" % (i+1)] = {"gid":"","text":"","img_path":""}
             continue
-        cur.execute("SELECT name,prise,description,image FROM goods WHERE gid = ?",(goods[i][0],))
+        cur.execute("SELECT name,price,description,image FROM goods WHERE gid = ?",(goods[i][0],))
         name,price,description,img_path = cur.fetchone()
         info["goods%d" % (i+1)] = {"gid":goods[i][0],"text":"%s %s花西币\n%s" % (name,str(price),description),"img_path":img_path}
 
     # 拼接模板
-    return tp.Template("./static/html/viewpage.html",info)
+    return tp.Template("./static/html/viewpage.html",info).render()
     
     
 
-# server.url.add('/shoppage',shoppage)
+server.url.add('/shoppage',shoppage)
 
 
 
 server.loop()
+
+
+

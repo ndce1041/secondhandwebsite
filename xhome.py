@@ -17,6 +17,9 @@ static = static_resources_manager.static
 
 TIMEOUT = 20
 
+
+
+
 # 获取当前文件路径
 PATH = sys.path[0]
 
@@ -160,7 +163,11 @@ class Server:
         client_addr = new_socket.getpeername()
         recv_data = b''
         while True:
-            new_socket.setblocking(False)
+            try:
+                new_socket.setblocking(False)
+            except:
+                INFO('设置非阻塞失败')
+
             try:
                 recv_data += new_socket.recv(1024)
             except Exception as e:

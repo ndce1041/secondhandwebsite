@@ -93,7 +93,7 @@ class url_manager:
         func = temp.get("func")
         if not func:
             return self.unfound, url_spot
-        return func,url_spot if not func else []
+        return func,url_spot
 
 
 

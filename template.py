@@ -13,6 +13,8 @@ class Template:
         self.template = self.read_template()
         self.replace_template()
 
+
+    def render(self):
         return rm.ResponseMaker().set_body(self.template.encode("utf-8"))
         
     def read_template(self):
@@ -26,13 +28,11 @@ class Template:
         """
         替换模板
         """
-        self.template = re.sub(r"{{ (%s) }}",replace,self.template)
-        # return self.template
-
-        # comp = re.compile(r"{{ %s }}")
+        print("替换")
 
         def replace(match):
-            temp = match.group(0)
+            temp = match.group("name")
+            print(temp)
             temp = temp.split(".")
             value = self.template_dict.copy()
             for i in temp:
@@ -40,6 +40,12 @@ class Template:
                     value = value[i]
                 else:
                     return "NOT FOUND"
-            return value
+            return str(value)
+
+        self.template = re.sub(r"{{ (?P<name>.+) }}",replace,self.template)
+        # return self.template
+
+        # comp = re.compile(r"{{ %s }}")
+        
 
 
