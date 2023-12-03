@@ -50,6 +50,8 @@ class AnalysisRequest(object):
         return str(self.request_head)
     
 
+    def body(self):
+        return self.request_head['body']
     
 
 
@@ -82,6 +84,13 @@ class AnalysisRequest(object):
                 else:
                     self.request_head["Accept"][i] = (self.request_head['Accept'][i],1)
         return self.request_head['Accept']
+    
+    # def content_type(self):
+    #     if "Content-Type" not in self.request_head or type(self.request_head['Content-Type']) == str:
+    #         self.request_head['Content-Type'] = {}
+    #     else:
+    #         if ""
+    #     return self.request_head['Content-Type']
 
 
 

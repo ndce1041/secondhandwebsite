@@ -129,18 +129,20 @@ class Server:
 
             # 路由分发
             ans = None
-            func,rest = self.url.get(self.request['path']["url"])
-            ans = func(self.request,key,rest=rest)
-            # try:
-            #     func,rest = self.url.get(self.request['path']["url"])
-            #     print(func,rest)
-            #     ans = func(self.request,key,rest=rest)
-            # except Exception as e:
-            #     ERROR('路由分发失败')
-            #     print(self.request['path']["url"])
-            #     print(self.url.url)
-            #     print(self.request['path']["url"][0] in self.url.url)
+            # print(self.request['path']["url"])
+            # func,rest = self.url.get(self.request['path']["url"])
+            # ans = func(self.request,key,rest=rest)
+            try:
+                func,rest = self.url.get(self.request['path']["url"])
+                # print(func,rest)
+                ans = func(self.request,key,rest=rest)
+            except Exception as e:
+                ERROR('路由分发失败')
+                print(self.request['path']["url"])
+                print(self.url.url)
+                print(self.request['path']["url"][0] in self.url.url)
             if ans == None:
+                print(func)
                 key[0].send(ResponseMaker(code=404).content())
                 key[0].close()
             elif ans == False:
@@ -149,8 +151,12 @@ class Server:
                 # 最好新建线程处理
                 pass
             else:
-                key[0].send(ans.content())
-                key[0].close()
+                try:
+                    key[0].send(ans.content())
+                    key[0].close()
+                except Exception as e:
+                    ERROR('数据发送失败')
+                    ERROR(e)
             ####
             
             
@@ -192,7 +198,12 @@ class Server:
         except Exception as e:
             ERROR('请求头解析失败')
             ERROR(e)
-            raise Exception('请求头解析失败%s' % str(client_addr) )
+            try:
+                self.selector.unregister(new_socket.fileno())
+            except:
+                pass
+            new_socket.close()
+
         
         # 第一行解析成功说明是有效的请求头
         DEBUG('请求头解析成功')
@@ -209,7 +220,7 @@ class Server:
                 #print(key)
                 try:
                     ip = key[0].getpeername()
-                    INFO("套接字响应",ip)
+                    INFO("套接字响应%s"%str(ip))
                 except:
                     pass
             
