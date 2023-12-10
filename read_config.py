@@ -8,7 +8,7 @@ try:
 except Exception as e:
     exit(1)
 else:
-    # TODO 添加静态资源默认回调
+    # 添加静态资源默认回调
     if "http_port" in conf_dict:
         PORT = conf_dict['http_port']
         print(PORT)

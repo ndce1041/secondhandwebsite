@@ -70,7 +70,7 @@ def logincheck(request,key,rest):
             cur.execute("UPDATE user SET last_login = ? WHERE uid = ?",("datetime('now','localtime')",uid))
             con.commit()
             # 写入cookie 设置30天过期
-            return rm.ResponseMaker().set_cookie("token",token,expires=30,path="/").set_cookie("uid",uid,expires=30,path="/").quick_jump("/shoppage") # TODO 跳转到主页
+            return rm.ResponseMaker().set_cookie("token",token,expires=30,path="/").set_cookie("uid",uid,expires=30,path="/").quick_jump("/shoppage")
         else:
             # 密码错误
             # print("密码错误")
@@ -97,7 +97,6 @@ def shoppage(request,key,rest):
     perpage_num = 3
 
     # 一页3个商品
-    # TODO 从数据库中获取商品信息
     cur.execute("SELECT gid FROM goods WHERE state = 0")
     if page == 1:
         goods = cur.fetchmany(perpage_num)
@@ -132,9 +131,7 @@ def sellpage(request,key,rest):
     with open("./static/html/sellpage.html","rb") as f:
         return rm.ResponseMaker().set_body(f.read())
     
-def myorder(request,key,rest):
-    raise NotImplementedError
-    pass
+
 
 @UserCheck
 @md.Form_Data
@@ -171,13 +168,20 @@ def sell_commit(request,key,rest):
     # 跳转到主页
     return rm.ResponseMaker().quick_jump("/shoppage")
 
+
+
+
+def myorder(request,key,rest):
+    raise NotImplementedError
+    pass
+
     
 server.url.add('/login',login)
 server.url.add('/logincheck',logincheck)
 server.url.add('/shoppage',shoppage)
 server.url.add('/sell',sellpage)
 server.url.add('/sellcommit',sell_commit)
-server.url.add('/order',myorder)
+server.url.add('/orderpage',myorder)
 
 print(server.url.url)
 server.loop()

@@ -64,7 +64,6 @@ IP = "127.0.0.1"
 #     ERROR('配置文件读取失败,请检查配置文件是否存在或者格式是否正确',e)
 #     exit(1)
 # else:
-#     # TODO 添加静态资源默认回调
 #     if "http_port" in conf_dict:
 #         PORT = conf_dict['http_port']
 #         print(PORT)

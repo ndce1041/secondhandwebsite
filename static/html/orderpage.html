@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Form</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- jq -->
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+
+    <script >
+        function get_order_content(gid){
+            $.ajax({
+            url: '/ordersearch',
+            type: 'POST',
+            contentType: 'application/json; charset=utf-8',
+            data: JSON.stringify({
+                'gid': gid
+            }),
+            dataType: 'json',
+            success: function(data) {
+                return data;
+            },
+            error: function(jqXHR, textStatus, errorThrown) {
+                // 这个函数会在请求失败后被调用
+                console.log('Error: ' + errorThrown);
+                return false;
+            }
+            });
+        }
+
+        function get_img(url) {
+            imgelement = document.getElementById('img');
+            var img = new Image();
+            img.src = url;
+            img.onload = function(){
+                imgelement.src = img.src;
+            }
+        }
+
+        function close_loader(){
+            loader = document.getElementsByClassName('loader')[0];
+            loader.style.display = 'none';
+        }
+
+        function open_loader(){
+            loader = document.getElementsByClassName('loader')[0];
+            loader.style.display = 'block';
+        }
+        
+
+    $(document).ready(function() {
+            $('#order_list').on('click', 'div', function() {
+                // 移除其他元素的高亮
+                $(this).siblings().removeClass('highlight');
+                // 高亮被点击的元素
+                $(this).addClass('highlight');
+                // 获取高亮元素
+                var highlightedElement = $(this);
+                console.log(highlightedElement);
+            });
+        });
+
+
+
+        window.onload = function(){
+            var firstdiv = $("#order_list div:first")
+            firstdiv.addClass('highlight');
+            var gid = firstdiv.attr('gid');
+
+
+
+
+            close_loader();
+        }
+
+
+
+    </script>
+
+
+    <style>
+        .loader {
+            border: 16px solid #00000000; /* Light grey */
+            border-top: 16px solid #3498db; /* Blue */
+            border-radius: 50%;
+            animation: spin 2s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+
+        .form-button-confirm:hover {
+            background-color: rgb(103, 209, 255);
+        }
+        .form-button-cancel:hover {
+            background-color: #ff7e67;
+        }
+
+        .highlight {
+            background-color:rgb(59 130 246); /* 你可以选择你喜欢的颜色 */
+        }
+    </style> 
+</head>
+<body class="bg-gray-100">
+    <div class="container mx-auto p-6 bg-white shadow-lg rounded-lg max-w-4xl mt-10">
+        <h1 class="text-2xl font-bold mb-4">My Order Form</h1>
+        <div class="flex">
+            <div id="order_list" class="w-1/3 h-96 pr-4 overflow-auto border-y border-blue-500 border-dashed">
+                {% for order in orders %}
+                {{ import order_tag }}
+                {% endfor %}
+                <!-- <div class="p-4 rounded mb-4 border  border-blue-500" gid="1">goods name</div>
+                <div class="p-4 rounded mb-4 border  border-blue-500" gid="2">goods name</div>
+                <div class="p-4 rounded mb-4 border  border-blue-500" gid="3">goods name</div> -->
+
+            </div>
+            <div class="w-2/3 p-4 rounded border border-dashed border-blue-500">
+                <img class="bg-gray-200 p-4 rounded mb-4 h-48" src="#">
+                <input type="text" placeholder="Goods Name" class=" w-full p-2 rounded mb-4 border-2 border-gray-300" disabled>
+                <textarea placeholder="Goods' Description" class=" w-full p-2 rounded mb-4 border-2 border-gray-300 h-32" disabled></textarea>
+                <div class="flex justify-between items-center">
+                    <div class="flex items-center">
+                        <span class="text-blue-500 mr-2;">(Number of Money)</span>
+                        <span class="text-gray-700" style="color: #ff5435;font-weight: 900;">$</span>
+                    </div>
+                    <div>
+                        <button class="form-button-confirm text-white font-bold py-2 px-4 rounded mr-2 highlight">Confirm</button>
+                        <button class="form-button-cancel bg-red-500 text-white font-bold py-2 px-4 rounded">Cancel</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+    <div class="loader fixed items-center bottom-0 shadow-lg"></div>
+</body>
+</html>
