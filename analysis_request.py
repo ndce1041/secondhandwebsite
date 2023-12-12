@@ -52,6 +52,8 @@ class AnalysisRequest(object):
 
     def body(self):
         return self.request_head['body']
+    def header(self):
+        return self.request_head
     
 
 

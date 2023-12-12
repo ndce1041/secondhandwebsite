@@ -125,9 +125,11 @@ def shoppage(request,key,rest):
         if i+1 > len(goods):
             info["goods%d" % (i+1)] = {"gid":"","text":"","img_path":""}
             continue
-        cur.execute("SELECT name,price,description,image FROM goods WHERE gid = ?",(int(goods[i][0]),))
-        name,price,description,img_path = cur.fetchone()
-        info["goods%d" % (i+1)] = {"gid":goods[i][0],"text":"%s %s花西币\n%s" % (name,str(price),description),"img_path":img_path}
+        cur.execute("SELECT name,price,description,image,state FROM goods WHERE gid = ?",(int(goods[i][0]),))
+        name,price,description,img_path,state = cur.fetchone()
+        if state != 0:
+            continue
+        info["goods%d" % (i+1)] = {"gid":goods[i][0],"text":"%s %s花西币\r\n%s" % (name,str(price),description),"img_path":img_path}
 
     # 拼接模板
     return tp.Template("./static/html/viewpage.html",info).render()
@@ -177,24 +179,26 @@ def sell_commit(request,key,rest):
 
 @UserCheck
 def myorder(request,key,rest):
-    template = env.get_template("myorder.html")
+    template = env.get_template("orderpage.html")
     # 获取用户id
     uid = int(request.cookie()["uid"])
     # 获取订单信息 按时间从新到旧排序
-    cur.execute("SELECT gid,oid FROM orders WHERE uid = ? ORDER BY datetime DESC",(uid,))
+    cur.execute("SELECT gid,oid FROM orders WHERE uid = ? ORDER BY time DESC",(uid,))
     orders = cur.fetchall()
     info = []
     for i in orders:
         cur.execute("SELECT name FROM goods WHERE gid = ?",(int(i[0]),))
         name = cur.fetchone()[0]
         info.append({"name":name,"oid":i[1]})
+        #print(info)
     # print(info)
-    return rm.ResponseMaker().set_body(template.render(info=info).encode("utf-8"))
+    return rm.ResponseMaker().set_body(template.render(goods=info).encode("utf-8"))
 
 @UserCheck
 @md.To_json
 def get_order_info(request,key,rest):
     uid = int(request.cookie()["uid"])
+    print(request["json"])
     oid = int(request["json"]["oid"])
     # 获取订单信息
     try:
@@ -207,13 +211,14 @@ def get_order_info(request,key,rest):
     name,description,image = cur.fetchone()
     # 拼接json
     info = {"name":name,"description":description,"image":image,"price":price,"state":state}
-    return rm.ResponseMaker().set_body(json.dumps(info).encode("utf-8")).set_header("Content-Type","application/json")
+    return rm.ResponseMaker().set_body(json.dumps(info).encode("utf-8")).set_head("Content-Type","application/json")
 
 @md.Form
 @UserCheck
 def order(request,key,rest):
     # 用于生成订单
     uid = int(request.cookie()["uid"])
+    print(request["form"])  
     gid = int(request["form"]["gid"])
     # 获取商品信息
     cur.execute("SELECT price,state FROM goods WHERE gid = ?",(gid,))
@@ -225,7 +230,7 @@ def order(request,key,rest):
     # 生成订单
     cur.execute("INSERT INTO orders (gid,uid,price,state) VALUES (?,?,?,?)",(gid,uid,price,0))
     con.commit()
-    return rm.ResponseMaker().quick_jump("/myorder")
+    return rm.ResponseMaker().quick_jump("/orderpage")
 
 
 
@@ -240,7 +245,7 @@ server.url.add('/orderpage',myorder) # 订单界面
 server.url.add('/ordersearch',get_order_info) # 订单查询
 
 
-print(server.url.url)
+# print(server.url.url)
 server.loop()
 
 

@@ -9,21 +9,21 @@
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
 
     <script>
-        function get_order_content(gid){
+        function get_order_content(oid){
             $.ajax({
             url: '/ordersearch',
             type: 'POST',
             contentType: 'application/json; charset=utf-8',
             data: JSON.stringify({
-                'gid': gid
+                'oid': oid
             }),
             dataType: 'json',
             success: function(data) {
                 // 这个函数会在请求成功之后被调用
                 console.log(data);
-                get_img(data.img_url);
+                get_img(data.image);
                 goodsname = document.getElementById('goodsname');
-                goodsname.value = data.goodsname;
+                goodsname.value = data.name;
 
                 description = document.getElementById('description');
                 description.value = data.description;
@@ -43,7 +43,7 @@
         function get_img(url) {
             imgelement = document.getElementById('img');
             var img = new Image();
-            img.src = "static/" + url;
+            img.src = "static/img/" + url;
             img.onload = function(){
                 imgelement.src = img.src;
             }
@@ -69,6 +69,8 @@
                 // 获取高亮元素
                 var highlightedElement = $(this);
                 console.log(highlightedElement);
+                var oid = highlightedElement.attr('oid');
+                get_order_content(oid);
             });
         });
 
@@ -77,8 +79,8 @@
         window.onload = function(){
             var firstdiv = $("#order_list div:first")
             firstdiv.addClass('highlight');
-            var gid = firstdiv.attr('gid');
-            var data = get_order_content(gid);
+            var oid = firstdiv.attr('oid');
+            get_order_content(oid);
 
 
 
@@ -121,20 +123,20 @@
     <div class="container mx-auto p-6 bg-white shadow-lg rounded-lg max-w-4xl mt-10">
         <h1 class="text-2xl font-bold mb-4">My Order Form</h1>
         <div class="flex">
-            <div id="order_list" class="w-1/3 h-96 pr-4 overflow-auto border-y border-blue-500 border-dashed">
+            <div id="order_list" class="w-1/3 h-96 overflow-auto border-y border-blue-500 border-dashed">
                 {% for item in goods %}
-                <div class="p-4 rounded mb-4 border  border-blue-500" gid="{{ item.oid }}">{{ item.name }}</div>
+                <div class="p-2 rounded mb-4 border  border-blue-500" oid="{{ item.oid }}">{{ item.name }}</div>
                 {% endfor %}
 
             </div>
             <div class="w-2/3 p-4 rounded border border-dashed border-blue-500">
-                <img class="bg-gray-200 p-4 rounded mb-4 h-48" src="#">
+                <img id="img" class="bg-gray-200 p-4 rounded mb-4 h-48 mx-auto" src="#">
                 <input id="goodsname" type="text" placeholder="Goods Name" class=" w-full p-2 rounded mb-4 border-2 border-gray-300" disabled>
                 <textarea id="description" placeholder="Goods' Description" class=" w-full p-2 rounded mb-4 border-2 border-gray-300 h-32" disabled></textarea>
                 <div class="flex justify-between items-center">
                     <div class="flex items-center">
-                        <span id="price" class="text-blue-500 mr-2;">0</span>
-                        <span class="text-gray-700" style="color: #ff5435;font-weight: 900;">$</span>
+                        <span id="price" class="text-blue-500 mr-2 pr-2;" style="font-size: xx-large;">0</span>
+                        <span class="text-gray-700 text-4xl" style="color: #ff5435;font-weight: 900;">$</span>
                     </div>
                     <div>
                         <button class="form-button-confirm text-white font-bold py-2 px-4 rounded mr-2 highlight">Confirm</button>

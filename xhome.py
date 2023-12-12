@@ -126,7 +126,7 @@ class Server:
             self.recv_data(key)
             # 数据存在self.request_head中
 
-            # 路由分发
+            # 路由分发 TODO 搞完要还原
             ans = None
             print(self.request['path']["url"])
             func,rest = self.url.get(self.request['path']["url"])

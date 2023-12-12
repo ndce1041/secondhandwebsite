@@ -73,11 +73,11 @@
                 </div>
             </div>
             <div class="w-full md:w-2/3 px-2">
-                <form action="/sellcommit" method="POST" class="bg-white p-4 rounded-lg shadow-lg" enctype="multipart/form-data">
+                <form action="/sellcommit" method="POST" class="bg-white p-4 rounded-lg shadow-lg" enctype="multipart/form-data" autocomplete="off">
                     <input name = "img" type="file" id="fileInput" accept="image/*" style="display: none;" onchange="handleFileSelect(event)">
                     <div class="mb-4">
                         <label for="productName" class="block text-gray-700 text-sm font-bold mb-2">输入商品名称</label>
-                        <input type="text" id="productName" name="name" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
+                        <input type="text" autocomplete="off" id="productName" name="name" class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" required>
                     </div>
                     <div class="mb-6">
                         <label for="productDescription" class="block text-gray-700 text-sm font-bold mb-2">输入商品描述文本</label>
