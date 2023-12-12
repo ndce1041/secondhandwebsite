@@ -47,6 +47,6 @@ cur.execute("INSERT INTO user VALUES (1000000001, 'admin', 'admin', 100000,'NULL
 cur.execute("INSERT INTO user VALUES (1000000002, 'user1', 'user1', 10,'NULL','NULL')")
 
 cur.execute("INSERT INTO goods VALUES (1000000001, 1000000001, 'iphone 12', 100, 'iphone 12 128G', 'iphone12.jpg', 0, 'NULL')")
-
+cur.execute("insert into orders values (10001, 1000000001, 1000000001, 100, 0,'NULL')")
 
 con.commit()

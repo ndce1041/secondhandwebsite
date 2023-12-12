@@ -128,18 +128,18 @@ class Server:
 
             # 路由分发
             ans = None
-            # print(self.request['path']["url"])
-            # func,rest = self.url.get(self.request['path']["url"])
-            # ans = func(self.request,key,rest=rest)
-            try:
-                func,rest = self.url.get(self.request['path']["url"])
-                # print(func,rest)
-                ans = func(self.request,key,rest=rest)
-            except Exception as e:
-                ERROR('路由分发失败')
-                print(self.request['path']["url"])
-                print(self.url.url)
-                print(self.request['path']["url"][0] in self.url.url)
+            print(self.request['path']["url"])
+            func,rest = self.url.get(self.request['path']["url"])
+            ans = func(self.request,key,rest=rest)
+            # try:
+            #     func,rest = self.url.get(self.request['path']["url"])
+            #     print(func,rest)
+            #     ans = func(self.request,key,rest=rest)
+            # except Exception as e:
+            #     ERROR('路由分发失败')
+            #     print(self.request['path']["url"])
+            #     print(self.url.url)
+            #     print(self.request['path']["url"][0] in self.url.url)
             if ans == None:
                 print(func)
                 key[0].send(ResponseMaker(code=404).content())

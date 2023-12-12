@@ -1,4 +1,5 @@
 import re
+import json
 
 # 确定一定是表单(不包含二进制数据)时调用的装饰器 会提前将表单数据存入request.form中
 # TODO 应该集成到analysis_request中
@@ -83,3 +84,29 @@ def Form_Data(func):
         request["form"] = temp
         return func(request,key,rest)
     return form_data
+
+
+
+
+def To_json(func):
+    def to_json(request,key,rest):
+        # 将请求体转换为json
+        # 检查请求头中是否有content-type
+        #print(request)
+        if "Content-Type" in request.header():
+            # 检查content-type是否为application/json
+            
+            if request["Content-Type"] == "application/json":
+                # 将请求体转换为json
+                json_data = json.loads(request.body())
+                # 返回json数据
+                request["json"] = json_data
+                return func(request,key,rest)
+            else:
+                print("Content-Type is not application/json")
+                return rm.ResponseMaker().set_body("Content-Type is not application/json".encode("utf-8"))
+
+        else:
+            print("Content-Type is not in request header")
+            return rm.ResponseMaker().set_body("Content-Type is not in request header".encode("utf-8"))
+    return to_json

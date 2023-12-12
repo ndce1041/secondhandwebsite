@@ -8,7 +8,7 @@
     <!-- jq -->
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
 
-    <script >
+    <script>
         function get_order_content(gid){
             $.ajax({
             url: '/ordersearch',
@@ -19,7 +19,18 @@
             }),
             dataType: 'json',
             success: function(data) {
-                return data;
+                // 这个函数会在请求成功之后被调用
+                console.log(data);
+                get_img(data.img_url);
+                goodsname = document.getElementById('goodsname');
+                goodsname.value = data.goodsname;
+
+                description = document.getElementById('description');
+                description.value = data.description;
+
+                price = document.getElementById('price');
+                price.innerHTML = data.price;
+
             },
             error: function(jqXHR, textStatus, errorThrown) {
                 // 这个函数会在请求失败后被调用
@@ -32,7 +43,7 @@
         function get_img(url) {
             imgelement = document.getElementById('img');
             var img = new Image();
-            img.src = url;
+            img.src = "static/" + url;
             img.onload = function(){
                 imgelement.src = img.src;
             }
@@ -67,6 +78,7 @@
             var firstdiv = $("#order_list div:first")
             firstdiv.addClass('highlight');
             var gid = firstdiv.attr('gid');
+            var data = get_order_content(gid);
 
 
 
@@ -110,21 +122,18 @@
         <h1 class="text-2xl font-bold mb-4">My Order Form</h1>
         <div class="flex">
             <div id="order_list" class="w-1/3 h-96 pr-4 overflow-auto border-y border-blue-500 border-dashed">
-                {% for order in orders %}
-                {{ import order_tag }}
+                {% for item in goods %}
+                <div class="p-4 rounded mb-4 border  border-blue-500" gid="{{ item.oid }}">{{ item.name }}</div>
                 {% endfor %}
-                <!-- <div class="p-4 rounded mb-4 border  border-blue-500" gid="1">goods name</div>
-                <div class="p-4 rounded mb-4 border  border-blue-500" gid="2">goods name</div>
-                <div class="p-4 rounded mb-4 border  border-blue-500" gid="3">goods name</div> -->
 
             </div>
             <div class="w-2/3 p-4 rounded border border-dashed border-blue-500">
                 <img class="bg-gray-200 p-4 rounded mb-4 h-48" src="#">
-                <input type="text" placeholder="Goods Name" class=" w-full p-2 rounded mb-4 border-2 border-gray-300" disabled>
-                <textarea placeholder="Goods' Description" class=" w-full p-2 rounded mb-4 border-2 border-gray-300 h-32" disabled></textarea>
+                <input id="goodsname" type="text" placeholder="Goods Name" class=" w-full p-2 rounded mb-4 border-2 border-gray-300" disabled>
+                <textarea id="description" placeholder="Goods' Description" class=" w-full p-2 rounded mb-4 border-2 border-gray-300 h-32" disabled></textarea>
                 <div class="flex justify-between items-center">
                     <div class="flex items-center">
-                        <span class="text-blue-500 mr-2;">(Number of Money)</span>
+                        <span id="price" class="text-blue-500 mr-2;">0</span>
                         <span class="text-gray-700" style="color: #ff5435;font-weight: 900;">$</span>
                     </div>
                     <div>
