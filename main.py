@@ -309,7 +309,8 @@ def recharge(request,key,rest):
     with open("./static/html/pay.html","rb") as f:
         return rm.ResponseMaker().set_body(f.read())
 
-    
+
+server.url.add("/",shoppage) # 主页
 server.url.add('/login',login) # 登录界面
 server.url.add('/logincheck',logincheck) # 登录检查
 server.url.add('/shoppage',shoppage) # 商店界面
