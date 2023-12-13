@@ -21,6 +21,7 @@
             success: function(data) {
                 // 这个函数会在请求成功之后被调用
                 console.log(data);
+                console.log(data.state);
                 get_img(data.image);
                 goodsname = document.getElementById('goodsname');
                 goodsname.value = data.name;
@@ -30,6 +31,14 @@
 
                 price = document.getElementById('price');
                 price.innerHTML = data.price;
+
+                if (data.state != 0){
+                    document.getElementById('confirm').style.display = 'none';
+                    document.getElementById('cancel').style.display = 'none';
+                }else{
+                    document.getElementById('confirm').style.display = "inline-block"
+                    document.getElementById('cancel').style.display = 'inline-block';
+                }
 
             },
             error: function(jqXHR, textStatus, errorThrown) {
@@ -58,21 +67,97 @@
             loader = document.getElementsByClassName('loader')[0];
             loader.style.display = 'block';
         }
-        
 
-    $(document).ready(function() {
-            $('#order_list').on('click', 'div', function() {
-                // 移除其他元素的高亮
-                $(this).siblings().removeClass('highlight');
-                // 高亮被点击的元素
-                $(this).addClass('highlight');
-                // 获取高亮元素
-                var highlightedElement = $(this);
-                console.log(highlightedElement);
-                var oid = highlightedElement.attr('oid');
-                get_order_content(oid);
+        function confirm(){
+            var highlightedElement = $('#order_list div.highlight');
+            var oid = highlightedElement.attr('oid');
+            open_loader();
+            $.ajax({
+            url: '/orderconfirm',
+            type: 'POST',
+            contentType: 'application/json; charset=utf-8',
+            data: JSON.stringify({
+                'oid': oid
+            }),
+            dataType: 'json',
+            success: function(data) {
+                // 这个函数会在请求成功之后被调用
+                document.getElementById('confirm').style.display = 'none';
+                document.getElementById('cancel').style.display = 'none';
+                console.log(data);
+                close_loader();
+                if (data.status == 1){
+                    alert('Confirm Success!');
+                    location.reload();
+                }else{
+                    alert('Confirm Failed!');
+                }
+            },
+            error: function(jqXHR, textStatus, errorThrown) {
+                // 这个函数会在请求失败后被调用
+                console.log('Error: ' + errorThrown);
+                close_loader();
+                return false;
+            }
+            });
+        }
+
+        function cancel(){
+            var highlightedElement = $('#order_list div.highlight');
+            var oid = highlightedElement.attr('oid');
+            open_loader();
+            $.ajax({
+            url: '/ordercancel',
+            type: 'POST',
+            contentType: 'application/json; charset=utf-8',
+            data: JSON.stringify({
+                'oid': oid
+            }),
+            dataType: 'json',
+            success: function(data) {
+                // 这个函数会在请求成功之后被调用
+                document.getElementById('confirm').style.display = 'none';
+                document.getElementById('cancel').style.display = 'none';
+                console.log(data);
+                close_loader();
+                if (data.status == 1){
+                    alert('Cancel Success!');
+                    location.reload();
+                }else{
+                    alert('Cancel Failed!');
+                }
+            },
+            error: function(jqXHR, textStatus, errorThrown) {
+                // 这个函数会在请求失败后被调用
+                console.log('Error: ' + errorThrown);
+                close_loader();
+                return false;
+            }
+            });
+        }
+        
+        $(document).ready(function() {
+            $('#confirm').on('click', function() {
+                confirm();
+            });
+            $('#cancel').on('click', function() {
+                cancel();
             });
         });
+
+        $(document).ready(function() {
+                $('#order_list').on('click', 'div', function() {
+                    // 移除其他元素的高亮
+                    $(this).siblings().removeClass('highlight');
+                    // 高亮被点击的元素
+                    $(this).addClass('highlight');
+                    // 获取高亮元素
+                    var highlightedElement = $(this);
+                    console.log(highlightedElement);
+                    var oid = highlightedElement.attr('oid');
+                    get_order_content(oid);
+                });
+            });
 
 
 
@@ -139,8 +224,8 @@
                         <span class="text-gray-700 text-4xl" style="color: #ff5435;font-weight: 900;">$</span>
                     </div>
                     <div>
-                        <button class="form-button-confirm text-white font-bold py-2 px-4 rounded mr-2 highlight">Confirm</button>
-                        <button class="form-button-cancel bg-red-500 text-white font-bold py-2 px-4 rounded">Cancel</button>
+                        <button class="form-button-confirm text-white font-bold py-2 px-4 rounded mr-2 highlight" id="confirm">Confirm</button>
+                        <button class="form-button-cancel bg-red-500 text-white font-bold py-2 px-4 rounded" id="cancel">Cancel</button>
                     </div>
                 </div>
             </div>

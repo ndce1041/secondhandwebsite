@@ -210,6 +210,7 @@ def get_order_info(request,key,rest):
     cur.execute("SELECT name,description,image FROM goods WHERE gid = ?",(gid,))
     name,description,image = cur.fetchone()
     # 拼接json
+    print("商品状态",state)
     info = {"name":name,"description":description,"image":image,"price":price,"state":state}
     return rm.ResponseMaker().set_body(json.dumps(info).encode("utf-8")).set_head("Content-Type","application/json")
 
@@ -225,6 +226,13 @@ def order(request,key,rest):
     price,state = cur.fetchone()
     if state != 0:
         return rm.ResponseMaker().set_body("商品已出售".encode("utf-8")).quick_jump("/shoppage")
+    
+    # 检查商品是否存在其他未完成订单
+    cur.execute("SELECT oid FROM orders WHERE gid = ? AND state = 0",(gid,))
+    if cur.fetchone():
+        return rm.ResponseMaker().set_body("商品已被下单".encode("utf-8")).quick_jump("/shoppage")
+
+
     # 跟新商品状态
     cur.execute("UPDATE goods SET state = 1 WHERE gid = ?",(gid,))
     # 生成订单
@@ -232,7 +240,77 @@ def order(request,key,rest):
     con.commit()
     return rm.ResponseMaker().quick_jump("/orderpage")
 
+@UserCheck
+@md.To_json
+def orderconfirm(request,key,rest):
+    # 用于确认订单
+    uid = int(request.cookie()["uid"])
+    print(request["json"])
+    oid = int(request["json"]["oid"])
+    # 获取订单信息
+    try:
+        cur.execute("SELECT gid,price,state FROM orders WHERE oid = ? AND uid = ?",(oid,uid))
+        gid,order_price,order_state = cur.fetchone()
+    except:
+        return rm.ResponseMaker(code=404).set_body("订单不存在".encode("utf-8"))
+    
+    # 获取商品信息
+    cur.execute("SELECT price,state FROM goods WHERE gid = ?",(gid,))
+    goods_price,goods_state = cur.fetchone()
 
+    # 获取用户信息
+    cur.execute("SELECT money FROM user WHERE uid = ?",(uid,))
+    money = cur.fetchone()[0]
+
+    # 更改订单状态
+    if order_state == 0 and goods_state == 1 and order_price == goods_price:
+        cur.execute("UPDATE orders SET state = 1 WHERE oid = ?",(oid,))
+        if money < order_price:
+            return rm.ResponseMaker().set_body("确认失败,余额不足".encode("utf-8"))
+        cur.execute("UPDATE user SET money = money - ? WHERE uid = ?",(order_price,uid))
+        # 给卖家加钱
+        cur.execute("SELECT uid FROM goods WHERE gid = ?",(gid,))
+        seller_id = cur.fetchone()[0]
+        cur.execute("UPDATE user SET money = money + ? WHERE uid = ?",(order_price,seller_id))
+        con.commit()
+        data = json.dumps({"state":1})
+        return rm.ResponseMaker().set_body(data.encode("utf-8"))
+    else:
+        return rm.ResponseMaker().set_body("确认失败,订单内容无效".encode("utf-8"))
+
+
+@UserCheck
+@md.To_json
+def ordercancel(request,key,rest):
+    # 用于取消订单
+    uid = int(request.cookie()["uid"])
+    print(request["json"])
+    oid = int(request["json"]["oid"])
+    # 获取订单信息
+    try:
+        cur.execute("SELECT gid,state FROM orders WHERE oid = ? AND uid = ?",(oid,uid))
+        gid,order_state = cur.fetchone()
+    except:
+        return rm.ResponseMaker(code=404).set_body("订单不存在".encode("utf-8"))
+    
+    # 获取商品信息
+    cur.execute("SELECT state FROM goods WHERE gid = ?",(gid,))
+    goods_state = cur.fetchone()[0]
+
+    # 更改订单状态
+    if order_state == 0 and goods_state == 1:
+        cur.execute("UPDATE orders SET state = 2 WHERE oid = ?",(oid,))
+        cur.execute("UPDATE goods SET state = 0 WHERE gid = ?",(gid,))
+        con.commit()
+        data = json.dumps({"state":1})
+        return rm.ResponseMaker().set_body(data.encode("utf-8"))
+    else:
+        return rm.ResponseMaker().set_body("取消失败,订单内容无效".encode("utf-8"))
+    
+def recharge(request,key,rest):
+    print("recharge")
+    with open("./static/html/pay.html","rb") as f:
+        return rm.ResponseMaker().set_body(f.read())
 
     
 server.url.add('/login',login) # 登录界面
@@ -243,6 +321,10 @@ server.url.add('/sellcommit',sell_commit) # 出售提交
 server.url.add('/order',order) # 生成订单
 server.url.add('/orderpage',myorder) # 订单界面
 server.url.add('/ordersearch',get_order_info) # 订单查询
+server.url.add('/orderconfirm',orderconfirm) # 订单确认
+server.url.add('/ordercancel',ordercancel) # 订单取消
+
+server.url.add('/recharge',recharge) # 充值界面
 
 
 # print(server.url.url)
