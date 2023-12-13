@@ -1,7 +1,7 @@
 
 import xhome as xh
 import response_maker as rm
-import template as tp
+
 
 
 import sqlite3 as sql
@@ -100,9 +100,9 @@ def shoppage(request,key,rest):
     else:
         page = 1
 
-    perpage_num = 3
+    perpage_num = 6
 
-    # 一页3个商品
+    # 一页6个商品
     cur.execute("SELECT gid FROM goods WHERE state = 0")
     if page == 1:
         goods = cur.fetchmany(perpage_num)
@@ -119,20 +119,24 @@ def shoppage(request,key,rest):
     # 获取用户信息
     cur.execute("SELECT username,money FROM user WHERE uid = ?",(uid,))
     info["username"],info["money"] = cur.fetchone()
-
+    info["goods"] = []
     # 获取商品信息
-    for i in range(perpage_num):
-        if i+1 > len(goods):
-            info["goods%d" % (i+1)] = {"gid":"","text":"","img_path":""}
-            continue
+    for i in range(len(goods)):
+        # if i+1 > len(goods):
+        #     info["goods%d" % (i+1)] = {"gid":"","text":"","img_path":""}
+        #     continue
         cur.execute("SELECT name,price,description,image,state FROM goods WHERE gid = ?",(int(goods[i][0]),))
         name,price,description,img_path,state = cur.fetchone()
         if state != 0:
             continue
-        info["goods%d" % (i+1)] = {"gid":goods[i][0],"text":"%s %s花西币\r\n%s" % (name,str(price),description),"img_path":img_path}
+
+
+        info['goods'].append({"gid":goods[i][0],"name": name,"money":price,"text":description,"img_path":img_path})
 
     # 拼接模板
-    return tp.Template("./static/html/viewpage.html",info).render()
+    template = env.get_template("viewpage.html")
+
+    return rm.ResponseMaker().set_body(template.render(info=info).encode("utf-8"))
 
 @UserCheck
 def sellpage(request,key,rest):
