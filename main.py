@@ -1,20 +1,13 @@
 
 import xhome as xh
 import response_maker as rm
-
+import middleware as md
 
 
 import sqlite3 as sql
-
-import middleware as md
-
 import json
-
-# 哈希
 import hashlib
-
 import jinja2 as jj
-
 env = jj.Environment(loader=jj.FileSystemLoader("./static/html"))
 
 
