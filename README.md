@@ -1,5 +1,6 @@
 # 技术文档
 github:https://github.com/ndce1041/secondhandwebsite
+JNU_id = 2021104247
 
 ## 后端框架相关
 
@@ -20,7 +21,7 @@ github:https://github.com/ndce1041/secondhandwebsite
 （5）.接收完毕交给`AnalysisRequest`对象解析，首先解析是否为http请求，如果是则返回请求路径,交给路由`url`寻找对应地址的回调函数，如果找到则将解析后的请求传入，否则执行默认无效路径回调函数。
 （6）.请求完成后直接断开连接，完成此次http请求。进入下一个循环
 
-注意事项：
+##### 注意事项：
 * 使用Server()实例化服务器对象
 * 使用Server.loop()开启服务器
 * 一个应用应该具有至少一个回调函数，否则只会返回404。
@@ -57,7 +58,7 @@ def func(request,key,rest=[]):
 
 路由对象本身是在维护一个树状字典，每当添加路径时根据路径建立路径，通过递归将建立的路径更新到树状字典中。
 
-路由提供的API：
+##### 路由提供的API：
 
 * 注意：后端路由位于`Server.url`
 * `__init__(unfound=func)` 
@@ -73,7 +74,9 @@ def func(request,key,rest=[]):
 ### 4. 默认静态回调
 
 设计为忠诚的返回对应文件,匹配不同文件对应的`Content-Type`,可以时进行压缩处理
+
 对应文件`static_resources_manager.py`
+
 初始化时读取配置文件中`static_path`条目，初始化时自动注册到配置文件`static_url`条目对应路径，当请求为对应静态路径时，剩余参数（子文件路径）会传入函数`rest`参数中，如果文件为文本类型会自动调用`gzip`压缩。如果没有对应文件会返回`404`
 
 例如`static_url="/static"`时，请求为`/static/img/a.css`,则根据路由规则`rest=["img","a.css"]`。随后此回调就会寻找`static_path`子目录下的`/img/a.css`文件，将此文件进行`gzip`压缩后添加请求头`'Content-Encoding = gzip'`并返回发送。
@@ -83,7 +86,7 @@ def func(request,key,rest=[]):
 设计思路为简单易用可以在一行内完成响应构建，实现常用功能
 对应文件`response_maker.py`提供链式调用快速生成响应。
 
-`response`对象提供API：
+##### `response`对象提供API：
 * `__init__(code=200)` 设置状态码（默认200） 并设置基础字段 
 * `set_body(byte) `可以设置body内容
 * `set_cookie(key,value)` 可以设置响应头`set_cookie`字段，可多次设置，也可以传入列表，字典等，另外有参数控制cookie行为
@@ -132,6 +135,8 @@ def func(request,key,rest=[]):
 ### 1. 数据库结构
 
 数据库分为三个表 ， `user` `goods` `orders` 分别对应用户信息，商品信息，订单信息。
+
+使用python自带的嵌入式数据库sqlite3，数据库生成语句在`setDB.py`中，数据库名为`main.db`
 
 #### 用户
 用户表
