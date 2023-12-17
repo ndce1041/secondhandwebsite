@@ -1,0 +1,51 @@
+INFO-2023-12-17 18:16:33,531 - xhome.py[line:87]:配置文件读取成功,端口:80,协议:HTTP/1.1,IP:127.0.0.1
+
+DEBUG-2023-12-17 18:16:34,393 - __init__.py[line:320]:matplotlib data path: C:\Users\xjh\AppData\Local\Programs\Python\Python311\Lib\site-packages\matplotlib\mpl-data
+
+DEBUG-2023-12-17 18:16:34,396 - __init__.py[line:320]:CONFIGDIR=C:\Users\xjh\.matplotlib
+
+DEBUG-2023-12-17 18:16:34,397 - __init__.py[line:1494]:interactive is False
+
+DEBUG-2023-12-17 18:16:34,397 - __init__.py[line:1495]:platform is win32
+
+DEBUG-2023-12-17 18:16:34,427 - __init__.py[line:320]:CACHEDIR=C:\Users\xjh\.matplotlib
+
+DEBUG-2023-12-17 18:16:34,428 - font_manager.py[line:1543]:Using fontManager instance from C:\Users\xjh\.matplotlib\fontlist-v330.json
+
+DEBUG-2023-12-17 18:16:35,469 - tpu_cluster_resolver.py[line:34]:Falling back to TensorFlow client; we recommended you install the Cloud TPU client directly with pip install cloud-tpu-client.
+
+DEBUG-2023-12-17 18:16:35,676 - __init__.py[line:47]:Creating converter from 7 to 5
+
+DEBUG-2023-12-17 18:16:35,676 - __init__.py[line:47]:Creating converter from 5 to 7
+
+DEBUG-2023-12-17 18:16:35,676 - __init__.py[line:47]:Creating converter from 7 to 5
+
+DEBUG-2023-12-17 18:16:35,676 - __init__.py[line:47]:Creating converter from 5 to 7
+
+WARNING-2023-12-17 18:16:37,084 - module_wrapper.py[line:149]:From C:\Users\xjh\AppData\Local\Programs\Python\Python311\Lib\site-packages\keras\src\losses.py:2976: The name tf.losses.sparse_softmax_cross_entropy is deprecated. Please use tf.compat.v1.losses.sparse_softmax_cross_entropy instead.
+
+
+DEBUG-2023-12-17 18:16:37,385 - xhome.py[line:91]:#初始化服务器......#
+
+INFO-2023-12-17 18:16:37,385 - xhome.py[line:115]:服务器初始化成功,端口:80,协议:HTTP/1.1,IP:127.0.0.1
+
+INFO-2023-12-17 18:16:37,385 - xhome.py[line:215]:等待事件发生...
+
+INFO-2023-12-17 18:16:57,392 - xhome.py[line:215]:等待事件发生...
+
+DEBUG-2023-12-17 18:16:59,533 - xhome.py[line:120]:服务器接收到新连接,IP:('127.0.0.1', 50513)
+
+INFO-2023-12-17 18:16:59,533 - xhome.py[line:215]:等待事件发生...
+
+DEBUG-2023-12-17 18:16:59,533 - xhome.py[line:120]:服务器接收到新连接,IP:('127.0.0.1', 50514)
+
+INFO-2023-12-17 18:16:59,533 - xhome.py[line:215]:等待事件发生...
+
+INFO-2023-12-17 18:16:59,535 - xhome.py[line:222]:套接字响应('127.0.0.1', 50514)
+
+INFO-2023-12-17 18:16:59,535 - xhome.py[line:166]:接收数据中...
+
+INFO-2023-12-17 18:16:59,535 - xhome.py[line:179]:数据接收中断 IP:('127.0.0.1', 50514)
+
+DEBUG-2023-12-17 18:16:59,535 - xhome.py[line:208]:请求头解析成功
+
