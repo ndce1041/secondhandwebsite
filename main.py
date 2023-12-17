@@ -2,20 +2,14 @@
 import xhome as xh
 import response_maker as rm
 import middleware as md
-
-
 import sqlite3 as sql
 import json
 import hashlib
 import jinja2 as jj
 env = jj.Environment(loader=jj.FileSystemLoader("./static/html"))
-
-
-
 server = xh.Server()
 con = sql.connect("main.db")
 cur = con.cursor()
-
 
 # 登录检查装饰器
 def UserCheck(func):
@@ -37,7 +31,6 @@ def UserCheck(func):
         else:
             #print("没有token")
             #没有token
-            #print(cookie)
             return rm.ResponseMaker().quick_jump("/login")
     return usercheck
 
@@ -45,8 +38,6 @@ def UserCheck(func):
 def login(request,key,rest):
     with open("./static/html/login.html","rb") as f:
         return rm.ResponseMaker().set_body(f.read())
-
-
 
 @md.Form
 def logincheck(request,key,rest):
@@ -61,7 +52,6 @@ def logincheck(request,key,rest):
         token = hashlib.sha256((password+salt).encode("utf-8")).hexdigest()
         if hash_pass == token:
             # print("密码正确")
-            # 密码正确
             # 写入数据库
             cur.execute("UPDATE user SET token = ? WHERE uid = ?",(token,uid))
             # 更新时间
@@ -75,24 +65,18 @@ def logincheck(request,key,rest):
             return rm.ResponseMaker().quick_jump("/login")
     except:
         # uid不存在
-        # print(type(uid))
-        # print(len(uid))
         # print("uid不存在,uid:%s" % uid)
         return rm.ResponseMaker().quick_jump("/login")
-
-
 
 @UserCheck
 def shoppage(request,key,rest):
     print("shoppage")
     # 读取分页信息
     url_info = request.path()["parameters"]
-
     if "page" in url_info:
         page = int(url_info["page"])
     else:
         page = 1
-
     perpage_num = 6
 
     # 一页6个商品
@@ -115,20 +99,13 @@ def shoppage(request,key,rest):
     info["goods"] = []
     # 获取商品信息
     for i in range(len(goods)):
-        # if i+1 > len(goods):
-        #     info["goods%d" % (i+1)] = {"gid":"","text":"","img_path":""}
-        #     continue
         cur.execute("SELECT name,price,description,image,state FROM goods WHERE gid = ?",(int(goods[i][0]),))
         name,price,description,img_path,state = cur.fetchone()
         if state != 0:
             continue
-
-
         info['goods'].append({"gid":goods[i][0],"name": name,"money":price,"text":description,"img_path":img_path})
-
     # 拼接模板
     template = env.get_template("viewpage.html")
-
     return rm.ResponseMaker().set_body(template.render(info=info).encode("utf-8"))
 
 @UserCheck
@@ -136,8 +113,6 @@ def sellpage(request,key,rest):
     with open("./static/html/sellpage.html","rb") as f:
         return rm.ResponseMaker().set_body(f.read())
     
-
-
 @UserCheck
 @md.Form_Data
 def sell_commit(request,key,rest):
@@ -157,10 +132,7 @@ def sell_commit(request,key,rest):
     if "description" in form_data:
         description = form_data["description"]["data"].decode("utf-8")
     # print(form_data)
-
-    # 获取用户id
     uid = int(request.cookie()["uid"])
-    # gid自增
     # 写入数据库
     try:
         cur.execute("INSERT INTO goods (name,price,description,image,uid,state) VALUES (?,?,?,?,?,?)",(name,price,description,filename,uid,0))
@@ -171,8 +143,6 @@ def sell_commit(request,key,rest):
         return rm.ResponseMaker().quick_jump("/sell")
     # 跳转到主页
     return rm.ResponseMaker().quick_jump("/shoppage")
-
-
 
 @UserCheck
 def myorder(request,key,rest):
@@ -187,8 +157,6 @@ def myorder(request,key,rest):
         cur.execute("SELECT name FROM goods WHERE gid = ?",(int(i[0]),))
         name = cur.fetchone()[0]
         info.append({"name":name,"oid":i[1]})
-        #print(info)
-    # print(info)
     return rm.ResponseMaker().set_body(template.render(goods=info).encode("utf-8"))
 
 @UserCheck
@@ -321,9 +289,7 @@ server.url.add('/orderpage',myorder) # 订单界面
 server.url.add('/ordersearch',get_order_info) # 订单查询
 server.url.add('/orderconfirm',orderconfirm) # 订单确认
 server.url.add('/ordercancel',ordercancel) # 订单取消
-
 server.url.add('/recharge',recharge) # 充值界面
-
 
 # print(server.url.url)
 server.loop()
